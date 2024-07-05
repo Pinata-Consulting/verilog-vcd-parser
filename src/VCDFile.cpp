@@ -4,20 +4,20 @@
 
 #include "VCDFile.hpp"
 
-        
+
 //! Instance a new VCD file container.
 VCDFile::VCDFile(){
 }
-        
+
 //! Destructor
 VCDFile::~VCDFile(){
     // Delete signals and scopes.
     for (VCDScope * scope : this -> scopes) {
-    
+
         for (VCDSignal * signal : scope -> signals) {
             delete signal;
         }
-        
+
         delete scope;
     }
 }
@@ -106,11 +106,11 @@ VCDValue * VCDFile::get_signal_value_at (
     VCDTime time,
     bool erase_prior
 ){
-    auto find = val_map.find(hash); 
+    auto find = val_map.find(hash);
     if(find == val_map.end()) {
         return nullptr;
     }
-    
+
     VCDSignalValues& vals = find->second;
 
     if(vals.size() == 0) {
@@ -144,5 +144,5 @@ VCDSignalValues * VCDFile::get_signal_values (
         return nullptr;
     }
 
-    return this -> val_map[hash];
+    return &this -> val_map[hash];
 }

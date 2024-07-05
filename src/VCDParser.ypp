@@ -12,7 +12,7 @@
 %file-prefix "VCDParser"
 %name-prefix "VCDParser"
 
-%code requires 
+%code requires
 {
     #include <string>
     #include <map>
@@ -42,48 +42,48 @@ VCDTime current_time = 0;
 
 }
 
-%token                  TOK_BRACKET_O         
-%token                  TOK_BRACKET_C         
-%token                  TOK_COLON             
-%token                  TOK_DOLLAR            
-%token                  TOK_KW_END            
-%token                  TOK_KW_COMMENT        
+%token                  TOK_BRACKET_O
+%token                  TOK_BRACKET_C
+%token                  TOK_COLON
+%token                  TOK_DOLLAR
+%token                  TOK_KW_END
+%token                  TOK_KW_COMMENT
 %token <std::string>    TOK_COMMENT_TEXT
-%token                  TOK_KW_DATE           
+%token                  TOK_KW_DATE
 %token <std::string>    TOK_DATE_TEXT
-%token                  TOK_KW_ENDDEFINITIONS 
-%token                  TOK_KW_SCOPE          
-%token                  TOK_KW_TIMESCALE      
-%token                  TOK_KW_UPSCOPE        
-%token                  TOK_KW_VAR            
-%token                  TOK_KW_VERSION        
+%token                  TOK_KW_ENDDEFINITIONS
+%token                  TOK_KW_SCOPE
+%token                  TOK_KW_TIMESCALE
+%token                  TOK_KW_UPSCOPE
+%token                  TOK_KW_VAR
+%token                  TOK_KW_VERSION
 %token <std::string>    TOK_VERSION_TEXT
-%token                  TOK_KW_DUMPALL        
-%token                  TOK_KW_DUMPOFF        
-%token                  TOK_KW_DUMPON         
-%token                  TOK_KW_DUMPVARS       
-%token <VCDScopeType>   TOK_KW_BEGIN          
-%token <VCDScopeType>   TOK_KW_FORK           
-%token <VCDScopeType>   TOK_KW_FUNCTION       
-%token <VCDScopeType>   TOK_KW_MODULE         
-%token <VCDScopeType>   TOK_KW_TASK           
-%token <VCDTimeRes>     TOK_TIME_NUMBER       
-%token <VCDTimeUnit>    TOK_TIME_UNIT         
-%token <VCDVarType>     TOK_VAR_TYPE          
-%token                  TOK_HASH              
-%token <VCDBit>         TOK_VALUE             
-%token <std::string>    TOK_BIN_NUM           
-%token                  TOK_BINARY_NUMBER     
-%token <std::string>    TOK_REAL_NUM          
-%token                  TOK_REAL_NUMBER       
-%token <std::string>    TOK_IDENTIFIER        
+%token                  TOK_KW_DUMPALL
+%token                  TOK_KW_DUMPOFF
+%token                  TOK_KW_DUMPON
+%token                  TOK_KW_DUMPVARS
+%token <VCDScopeType>   TOK_KW_BEGIN
+%token <VCDScopeType>   TOK_KW_FORK
+%token <VCDScopeType>   TOK_KW_FUNCTION
+%token <VCDScopeType>   TOK_KW_MODULE
+%token <VCDScopeType>   TOK_KW_TASK
+%token <VCDTimeRes>     TOK_TIME_NUMBER
+%token <VCDTimeUnit>    TOK_TIME_UNIT
+%token <VCDVarType>     TOK_VAR_TYPE
+%token                  TOK_HASH
+%token <VCDBit>         TOK_VALUE
+%token <std::string>    TOK_BIN_NUM
+%token                  TOK_BINARY_NUMBER
+%token <std::string>    TOK_REAL_NUM
+%token                  TOK_REAL_NUMBER
+%token <std::string>    TOK_IDENTIFIER
 %token <VCDTime>        TOK_DECIMAL_NUM
 %token                  END  0 "end of file"
 
 %start input
 
 %type <std::string>     comment_text
-%type <std::string>     version_text 
+%type <std::string>     version_text
 %type <std::string>     date_text
 %type <VCDSignal*>      reference
 %type <VCDScopeType>    scope_type
@@ -94,7 +94,7 @@ input :
     %empty
 |   declaration_commands simulation_commands
 |   simulation_commands
-|   declaration_commands 
+|   declaration_commands
 ;
 
 declaration_commands :
@@ -104,7 +104,7 @@ declaration_commands :
 
 simulation_commands:
     simulation_command
-|   simulation_commands simulation_command 
+|   simulation_commands simulation_command
 ;
 
 declaration_command :
@@ -117,16 +117,16 @@ declaration_command :
 |   TOK_KW_ENDDEFINITIONS TOK_KW_END
 |   TOK_KW_SCOPE    scope_type TOK_IDENTIFIER TOK_KW_END {
     // PUSH the current scope stack.
-    
+
     VCDScope * new_scope = new VCDScope();
     new_scope -> name = $3;
     new_scope -> type = $2;
     new_scope -> parent = driver.scopes.top();
-    
+
     driver.fh -> add_scope(
         new_scope
     );
-    
+
     driver.scopes.top() -> children.push_back(new_scope);
     driver.scopes.push(new_scope);
 
@@ -141,7 +141,7 @@ declaration_command :
     driver.scopes.pop();
 
 }
-|   TOK_KW_VAR      TOK_VAR_TYPE TOK_DECIMAL_NUM TOK_IDENTIFIER reference 
+|   TOK_KW_VAR      TOK_VAR_TYPE TOK_DECIMAL_NUM TOK_IDENTIFIER reference
     TOK_KW_END {
     // Add this variable to the current scope.
 
@@ -203,15 +203,17 @@ scalar_value_change:  TOK_VALUE TOK_IDENTIFIER {
 
     VCDSignalHash   hash  = $2;
     if (current_time > driver.start_time) {
-    VCDTimedValue   toadd = {
-        current_time,
-        VCDValue($1) };
+        VCDTimedValue   toadd = {
+            current_time,
+            VCDValue($1)
+        };
 
-    driver.fh -> add_signal_value(std::move(toadd), hash);
+        driver.fh -> add_signal_value(std::move(toadd), hash);
+    }
 }
 
 
-vector_value_change: 
+vector_value_change:
     TOK_BIN_NUM     TOK_IDENTIFIER {
 
     VCDBitVector vec;
@@ -253,7 +255,7 @@ vector_value_change:
     VCDSignalHash   hash  = $2;
 
     VCDReal real_value;
-    
+
     // Legal way of parsing dumped floats according to the spec.
     // Sec 21.7.2.1, paragraph 4.
     const char * buffer = $1.c_str() + 1;
